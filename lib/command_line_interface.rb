@@ -95,11 +95,14 @@ to see a list of outfits in their wardrobe:"
 ### DELETE ###
   def delete_outfit_in_wardrobe
      outfits = list_of_outfits
-     puts "Please enter the outfit id of the outfit you wish to delete"
+     puts "Please enter the outfit id of the outfit you wish to delete:"
      input = gets.chomp
-     wardrobe = Wardrobe.find_by(outfit: outfits[input.to_i-1])
+    if wardrobe = Wardrobe.find_by(outfit: outfits[input.to_i-1])
      wardrobe.destroy
      puts "The outfit has been deleted."
+   else
+     puts "That isn't a valid selection. Please try again."
+   end
   end
 
 ###############################################################################
