@@ -1,15 +1,9 @@
 require 'pry'
 class CommandLineInterface
-  #FIXME: no duplicate Stylists, Outfits, Wardrobes
-  #FIXME: show all Stylists
-  #FIXME: show fanciness level on update
+  #FIXME: no duplicate Stylists, Outfits
   #FIXME: make sure we don't delete something we don't have (*)
   #FIXME: make it so the program shows you everything you need to see. For example,
   #       anything you use rake console to see
-
-  # def initialize
-  #   @stylists = []
-  # end
 
  def run
     puts "Welcome to The Style Edit!"
@@ -44,32 +38,34 @@ class CommandLineInterface
   def create_a_stylist
     puts "Please create a username"
     user = gets.chomp
-      stylist = Stylist.create(name: user)
+    if Stylist.find_by(name: user)
+      puts "error message here"
+      create_a_stylist
+    else stylist = Stylist.create(name: user)
       sleep(1)
       puts "Welcome to The Style Edit, #{stylist.name}!"
   end
+end
 
 ### READ ###
   def list_of_outfits
-      puts "Choose a stylist"
-      puts "-------------------------------------"
-      Stylist.all.each.with_index(1){ |s,i| puts "#{i}. #{s.name}" }
-      puts "-------------------------------------"
-      puts "Please enter a current stylist id number
+    stylists = Stylist.all
+    puts "Choose a stylist"
+    puts "-------------------------------------"
+    x = []
+    stylists.each.with_index(1) do
+      |s,i| puts "#{i}. #{s.name}"
+      x << s
+    end
+    puts "-------------------------------------"
+    puts "Please enter a current stylist id number
 to see a list of outfits in their wardrobe:"
-    answer = gets.chomp
-      if answer == "1" || answer == "1."
-        allie = Stylist.find_by(name: "Allie")
-        allie.outfits.each {|outfit| puts outfit.name}
-      elsif answer == "2" || answer == "2."
-        katie = Stylist.find_by(name: "Katie")
-        katie.outfits.each {|outfit| puts outfit.name}
-      elsif answer == "3" || answer == "3."
-        rene = Stylist.find_by(name: "Rene")
-        rene.outfits.each {|outfit| puts outfit.name}
-      elsif answer == "4" || answer == "4."
-        tim = Stylist.find_by(name: "Tim")
-        tim.outfits.each {|outfit| puts outfit.name}
+    answer = gets.chomp.to_i
+    the_stylist = x[answer-1]
+    if the_stylist
+      the_stylist.outfits.each.with_index(1) do
+        |outfit, i| puts "#{i}. #{outfit.name}"
+      end
     else
       sleep(1)
       puts "Oh no! That isn't a valid stylist id."
@@ -86,18 +82,15 @@ to see a list of outfits in their wardrobe:"
     answer = gets.chomp
     puts "Please type in a number 1-10 to update the fanciness level"
     level = gets.chomp
-    if answer.start_with?("1")
-      outfit = Outfit.find_by(name: "Casual Day Outfit")
+    outfits = [
+      Outfit.find_by(name: "Casual Day Outfit"),
+      Outfit.find_by(name: "Date Outfit"),
+      Outfit.find_by(name: "Office Outfit"),
+      Outfit.find_by(name: "Gala Outfit")
+    ]
+    if outfit = outfits[answer.to_i-1]
       outfit.update(fanciness_level: level.to_i)
-    elsif answer.start_with?("2")
-      outfit = Outfit.find_by(name: "Date Outfit")
-       outfit.update(fanciness_level: level.to_i)
-    elsif answer.start_with?("3")
-      outfit = Outfit.find_by(name: "Office Outfit")
-      outfit.update(fanciness_level: level.to_i)
-    elsif answer.start_with?("4")
-      outfit = Outfit.find_by(name: "Gala Outfit")
-        outfit.update(fanciness_level: level.to_i)
+      puts "Your #{outfit.name} has been updated with a new fanciness level of #{level}!"
     else
       puts "That doesn't seem right. Please try again."
     end
@@ -105,42 +98,14 @@ to see a list of outfits in their wardrobe:"
 
 ### DELETE ###
   def delete_outfit_in_wardrobe
-    puts "Please enter your username:"
-    username = gets.chomp
-    stylist = Stylist.find_by(name: username)
-    puts "Please select an outfit that you would like to delete from your wardrobe:"
-    puts "-------------------------------------"
-    puts  "1. Casual Day Outfit, 2. Date Outfit, 3. Office Outfit, 4. Gala Outfit"
-    puts "-------------------------------------"
-    sleep(1)
-    answer = gets.chomp
-      if answer.start_with?("1")
-        outfit = Outfit.find_by(name: "Casual Day Outfit")
-      wardrobe = Wardrobe.find_by(stylist_id: stylist.id , outfit_id: outfit.id)
-      wardrobe.delete
-      elsif answer.start_with?("2")
-        outfit = Outfit.find_by(name: "Date Outfit")
-        wardrobe = Wardrobe.find_by(stylist_id: stylist.id , outfit_id: outfit.id)
-        wardrobe.delete
-      elsif answer.start_with?("3")
-        outfit = Outfit.find_by(name: "Office Outfit")
-      wardrobe =  Wardrobe.find_by(stylist_id: stylist.id , outfit_id: outfit.id)
-      wardrobe.delete
-      elsif answer.start_with?("4")
-        outfit = Outfit.find_by(name: "Gala Outfit")
-          wardrobe = Wardrobe.find_by(stylist_id: stylist.id , outfit_id: outfit.id)
-          wardrobe.delete
-      else
-        puts "That outfit id is invalid. Please try again."
-      end
+     outfits = list_of_outfits
+     puts "Please enter the outfit id of the outfit you wish to delete"
+     input = gets.chomp
+     wardrobe = Wardrobe.find_by(outfit: outfits[input.to_i-1])
+     wardrobe.destroy
+     puts "The outfit has been deleted."
   end
 
-  # def has_outfit(stylist_id, outfit_id)
-  #   Wardrobe.find_by(stylist_id: stylist_id, outfit_id: outfit_id)
-  #   if true
-  #     Wardrobe.delete(stylist_id: stylist_id, outfit_id: outfit_id)
-  #   end
-  # end
 ###############################################################################
      ### CREATE 2 ###
      def add_outift_to_wardrobe
