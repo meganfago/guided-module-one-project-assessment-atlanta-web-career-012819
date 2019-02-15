@@ -1,9 +1,5 @@
 require 'pry'
 class CommandLineInterface
-  #FIXME: no duplicate Stylists, Outfits
-  #FIXME: make sure we don't delete something we don't have (*)
-  #FIXME: make it so the program shows you everything you need to see. For example,
-  #       anything you use rake console to see
 
  def run
     puts "Welcome to The Style Edit!"
@@ -39,7 +35,7 @@ class CommandLineInterface
     puts "Please create a username"
     user = gets.chomp
     if Stylist.find_by(name: user)
-      puts "error message here"
+      puts "This name already exists!"
       create_a_stylist
     else stylist = Stylist.create(name: user)
       sleep(1)
