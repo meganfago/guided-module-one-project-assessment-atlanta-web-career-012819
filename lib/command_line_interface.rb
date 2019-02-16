@@ -72,18 +72,20 @@ to see a list of outfits in their wardrobe:"
   def update_outfit_fanciness_level
     puts "Please select an outfit that you would like to update the fanciness level:"
     puts "-------------------------------------"
-    puts  "1. Casual Day Outfit, 2. Date Outfit, 3. Office Outfit, 4. Gala Outfit"
-    puts "-------------------------------------"
-    sleep(1)
-    answer = gets.chomp
-    puts "Please type in a number 1-10 to update the fanciness level"
-    level = gets.chomp
     outfits = [
       Outfit.find_by(name: "Casual Day Outfit"),
       Outfit.find_by(name: "Date Outfit"),
       Outfit.find_by(name: "Office Outfit"),
       Outfit.find_by(name: "Gala Outfit")
     ]
+    outfits.each.with_index(1) do|o, i|
+      puts " #{i}. #{o.name} & #{o.fanciness_level}"
+    end
+    puts "-------------------------------------"
+    sleep(1)
+    answer = gets.chomp
+    puts "Please type in a number 1-10 to update the fanciness level"
+    level = gets.chomp
     if outfit = outfits[answer.to_i-1]
       outfit.update(fanciness_level: level.to_i)
       puts "Your #{outfit.name} has been updated with a new fanciness level of #{level}!"
@@ -94,12 +96,12 @@ to see a list of outfits in their wardrobe:"
 
 ### DELETE ###
   def delete_outfit_in_wardrobe
-     outfits = list_of_outfits
+     outfits = list_of_outfits #the array of outfits the stylist has
      puts "Please enter the outfit id of the outfit you wish to delete:"
      input = gets.chomp
     if wardrobe = Wardrobe.find_by(outfit: outfits[input.to_i-1])
      wardrobe.destroy
-     puts "The outfit has been deleted."
+     puts "The #{outfits[input.to_i-1].name} has been deleted."
    else
      puts "That isn't a valid selection. Please try again."
    end
